@@ -65,18 +65,6 @@ sub _do_message_passing_read {
 
 # ["load",[{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}]
 # "transport.tx.size",[{"min":0,"max":0,"name":"transport.tx.size","type":0}],{"plugin":"ElasticSearch","time":1341655799.77979,"type":"transport.tx.size","values":[9725948078],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}
-#    my @values;
-#    foreach my $val (@{ $data->{values} }) {
-#        my $meta = shift(@$types);
-#        $meta->{value} = $val;
-#        push(@values, $meta);
-#        $meta->{type} = $_TYPE_LOOKUP{$meta->{type}} || $meta->{type};
-#    }
-#    $data->{values} = \@values;
-#    my $output = _input() || return 0;
-#    $output->consume($data);
-#}
-
 sub _input {
     if (!$INPUT) {
         try {
@@ -159,6 +147,11 @@ Collectd::Plugin::Read::Message::Passing - Read collectd metrics via Message::Pa
 
 =head1 SYNOPSIS
 
+    # Only tested with 1 read thread!
+    ReadThreads   1
+    # You MUST setup types.db for all types you emit!
+    TypesDB       "/usr/share/collectd/types.db"
+    TypesDB       "/usr/local/share/collectd/types_local.db"
     <LoadPlugin perl>
         Globals true
     </LoadPlugin>
@@ -169,7 +162,7 @@ Collectd::Plugin::Read::Message::Passing - Read collectd metrics via Message::Pa
             # MANDATORY - You MUST configure an output class
             inputclass "ZeroMQ"
             <inputoptions>
-                connect "tcp://192.168.0.1:5552"
+                socket_bind "tcp://192.168.0.1:5552"
             </inputoptions>
             # OPTIONAL - Defaults to JSON
             #decoderclass "JSON"
@@ -231,7 +224,9 @@ Collectd::Plugin::Read::Message::Passing - Read collectd metrics via Message::Pa
 
 A collectd plugin to consume metrics from L<Message::Passing> into L<collectd|http://collectd.org/>.
 
-B<WARNING:> This plugin is pre-alpha, and collectd causes blocking - may only work with ZeroMQ, or not at all.
+B<WARNING:> This plugin is pre-alpha, and is only tested with 1 collectd thread and the ZeroMQ Input.
+
+B<NOTE:> You B<MUST> have registered any types you ingest in a C<types.db> for collectd. Failure to do this can result in segfaults!
 
 =head1 PACKAGE VARIABLES
 
