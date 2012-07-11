@@ -1,3 +1,6 @@
+  - Make the ::Read plugin properly work to recieve metrics
+    (tested with ZeroMQ)
+
 0.005
   - Add repository metadata
 
