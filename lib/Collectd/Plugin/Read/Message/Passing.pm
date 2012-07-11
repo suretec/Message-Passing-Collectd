@@ -8,7 +8,11 @@ use String::RewritePrefix ();
 use Try::Tiny;
 use Message::Passing::Output::Callback;
 use AnyEvent;
-use threads;
+BEGIN {
+    *tid = eval {
+        require threads;
+    } ? sub { threads->tid } : sub { 0 };
+}
 use namespace::clean;
 
 our $INPUT;
@@ -81,7 +85,7 @@ sub _input {
             );
         }
         catch {
-            Collectd::plugin_log(Collectd::LOG_WARNING, "Got exception building inputs: $_ - DISABLING thread id " . threads->tid);
+            Collectd::plugin_log(Collectd::LOG_WARNING, "Got exception building inputs: $_ - DISABLING thread id " . tid());
             undef $INPUT;
         };
     }
@@ -90,7 +94,7 @@ sub _input {
 
 sub init {
     if (!$CONFIG{inputclass}) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "No inputclass config for Message::Passing plugin - disabling PID $$ TID " . threads->tid);
+        Collectd::plugin_log(Collectd::LOG_WARNING, "No inputclass config for Message::Passing plugin - disabling PID $$ TID " . tid());
         return 0;
     }
     $CONFIG{inputclass} = String::RewritePrefix->rewrite(
