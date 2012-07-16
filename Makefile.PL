@@ -12,6 +12,7 @@ authority 'GHENRY';
 
 requires 'Message::Passing';
 requires 'JSON';
+requires 'AnyEvent';
 requires 'Try::Tiny';
 requires 'String::RewritePrefix';
 requires 'Module::Runtime';
