@@ -8,7 +8,7 @@ use Module::Install::Authority;
 all_from 'lib/Message/Passing/Collectd.pm';
 
 license 'perl';
-authority 'GHENRY';
+authority 'cpan:GHENRY';
 
 requires 'Message::Passing';
 requires 'JSON';
